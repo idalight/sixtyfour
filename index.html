@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Sixtyfour Convergence Font</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sixtyfour+Convergence:BLED,SCAN,XELA,YELA@0..100,-53..100,-100..100,-100..100&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+            overflow: hidden;
+        }
+
+        nav {
+            position: absolute;
+            top: 0;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+
+        nav a {
+            color: red;
+            padding: 18px 20px;
+            text-decoration: none;
+            text-align: center;
+            font-size: 18px;
+        }
+
+        .sixtyfour-convergence {
+            font-family: "Sixtyfour Convergence", sans-serif;
+            font-size: 110px;
+            font-weight: 400;
+            font-style: normal;
+            position: absolute;
+        }
+
+        .dance {
+            top: 3vw;
+            position: absolute;
+            font-size: 18px;
+            color: black;
+            font-family: "Open Sans";
+        }
+
+        .word {
+            bottom: 2vw;
+            position: absolute;
+            font-size: 18px;
+            color: red;
+            font-family: "Open Sans";
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <a href="#" id="bleedScan">Bleed/Scanlines</a>
+    <a href="#" id="alignment">Horizontal/Vertical Element</a>
+    <a href="#" id="color">Color</a>
+</nav>
+
+<div id="myName" class="sixtyfour-convergence"></div>
+<div class="dance" id="dance">I wanna dance with somebody</div>
+<div class="word">move your mouse and click</div>
+
+<audio id="danceAudio" src="dance.mp3"></audio>
+
+<script type="text/javascript">
+    let name = prompt("Please enter the text in English");
+    let textElement = document.getElementById("myName");
+    textElement.innerHTML = name;
+
+    let mode = "bledScan";  // Default mode
+    let isLocked = false;   // Variable to track if the values are locked
+    let currentBled = 0, currentScan = 0, currentXela = 0, currentYela = 0, currentHue = 0, currentSaturation = 50;
+
+    let speedX = 5, speedY = 5, posX = window.innerWidth / 2, posY = window.innerHeight / 2;
+
+    // Variables for music playback speed
+    let audio = document.getElementById("danceAudio");
+    let clickCount = 0; // Track number of button clicks
+    let maxClicks = 20; // Limit for increasing speed
+
+    document.body.style.textAlign = "center";
+
+    window.onmousemove = function(e) {
+        if (!isLocked) {
+            switch (mode) {
+                case "bledScan":
+                    let bleed = (e.clientX / window.innerWidth) * 100;
+                    let scan = (e.clientY / window.innerHeight) * 153 - 53;
+
+                    currentBled = Math.max(0, Math.min(100, bleed));
+                    currentScan = Math.max(-53, Math.min(100, scan));
+
+                    textElement.style.fontVariationSettings = `"BLED" ${currentBled}, "SCAN" ${currentScan}, "XELA" ${currentXela}, "YELA" ${currentYela}`;
+                    break;
+                case "alignment":
+                    let xela = (e.clientX / window.innerWidth) * 200 - 100;
+                    let yela = (e.clientY / window.innerHeight) * 200 - 100;
+
+                    currentXela = Math.max(-100, Math.min(100, xela));
+                    currentYela = Math.max(-100, Math.min(100, yela));
+
+                    textElement.style.fontVariationSettings = `"BLED" ${currentBled}, "SCAN" ${currentScan}, "XELA" ${currentXela}, "YELA" ${currentYela}`;
+                    break;
+                case "color":
+                    let hue = (e.clientX / window.innerWidth) * 360;
+                    let saturation = (e.clientY / window.innerHeight) * 100;
+
+                    currentHue = hue;
+                    currentSaturation = saturation;
+
+                    document.body.style.backgroundColor = `hsl(${currentHue}, ${currentSaturation}%, 50%)`;
+                    break;
+            }
+        }
+    };
+
+    document.body.onclick = function() {
+        isLocked = !isLocked;
+        console.log(isLocked ? "Settings are now locked." : "Settings can now be adjusted again.");
+    };
+
+    document.getElementById("bleedScan").onclick = function() {
+        mode = "bledScan";
+        textElement.style.fontVariationSettings = `"BLED" ${currentBled}, "SCAN" ${currentScan}, "XELA" ${currentXela}, "YELA" ${currentYela}`;
+    };
+
+    document.getElementById("alignment").onclick = function() {
+        mode = "alignment";
+        textElement.style.fontVariationSettings = `"BLED" ${currentBled}, "SCAN" ${currentScan}, "XELA" ${currentXela}, "YELA" ${currentYela}`;
+    };
+
+    document.getElementById("color").onclick = function() {
+        mode = "color";
+        document.body.style.backgroundColor = `hsl(${currentHue}, ${currentSaturation}%, 50%)`;
+    };
+
+    function bounceText() {
+        posX += speedX;
+        posY += speedY;
+
+        if (posX + textElement.offsetWidth > window.innerWidth || posX < 0) speedX = -speedX;
+        if (posY + textElement.offsetHeight > window.innerHeight || posY < 0) speedY = -speedY;
+
+        textElement.style.left = `${posX}px`;
+        textElement.style.top = `${posY}px`;
+
+        requestAnimationFrame(bounceText);
+    }
+
+    document.getElementById("dance").onclick = function() {
+        // Start bouncing the text
+        bounceText();
+
+        // Play the audio
+        audio.play();
+
+        // Increase playback speed by 0.2
+        if (clickCount < maxClicks) {
+            audio.playbackRate += 0.2;
+            clickCount++;
+        } else {
+            alert("don't be silly");
+        }
+    };
+</script>
+
+</body>
+</html>
